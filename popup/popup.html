@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One-Click Bug Reporter</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="../icons/logo.png" alt="One-Click Bug Reporter Logo" class="brand-logo-img">
+        </div>
+        <div class="brand-text">
+          <h1>Bug Reporter</h1>
+          <span class="badge-target" id="activeTargetBadge">GitHub</span>
+          <span class="badge-shortcut" title="Keyboard Shortcut: Alt+Shift+B">Alt+Shift+B</span>
+        </div>
+      </div>
+      <button class="icon-button" id="btnOpenSettings" title="Configure Integration Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Main View: Reporter Form & Screenshot Editor -->
+    <main class="main-content" id="viewReporter">
+      
+      <!-- Screenshot Preview & Annotator -->
+      <section class="section-card screenshot-section">
+        <div class="section-title">
+          <span>Viewport Screenshot & Markup</span>
+          <div class="canvas-tools">
+            <button class="tool-btn active" id="toolBox" title="Draw Red Highlight Box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </button>
+            <button class="tool-btn" id="toolPencil" title="Freehand Draw">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            </button>
+            <button class="tool-btn" id="toolArrow" title="Draw Arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="19" x2="19" y2="5"></line><polyline points="12 5 19 5 19 12"></polyline></svg>
+            </button>
+            <button class="tool-btn" id="toolUndo" title="Undo Last Annotation">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+            </button>
+            <button class="tool-btn danger" id="toolClear" title="Clear Canvas Annotations">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <canvas id="screenshotCanvas"></canvas>
+          <div class="canvas-loader" id="canvasLoader">
+            <div class="spinner"></div>
+            <span>Capturing Viewport...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bug Form Fields -->
+      <form id="bugForm" onsubmit="return false;">
+        <div class="form-row">
+          <div class="form-group flex-3">
+            <label for="bugTitle">Bug Title <span class="required">*</span></label>
+            <input type="text" id="bugTitle" placeholder="Brief summary of the issue..." required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="bugSeverity">Severity</label>
+            <select id="bugSeverity">
+              <option value="Low">Low 🔵</option>
+              <option value="Medium" selected>Medium 🟡</option>
+              <option value="High">High 🟠</option>
+              <option value="Critical">Critical 🔴</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bugSteps">Steps to Reproduce / Details</label>
+          <textarea id="bugSteps" rows="3" placeholder="1. Go to page...&#10;2. Click on action button...&#10;3. Observed error behavior..."></textarea>
+        </div>
+
+        <!-- Diagnostics Accordions -->
+        <div class="accordions-container">
+          
+          <!-- Console Errors Accordion -->
+          <div class="accordion-item" id="accordionConsole">
+            <button type="button" class="accordion-header">
+              <div class="accordion-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span>Captured Console Logs</span>
+              </div>
+              <div class="accordion-meta">
+                <span class="pill-badge error" id="badgeConsoleCount">0 Logs</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+            </button>
+            <div class="accordion-content">
+              <div class="log-list" id="consoleLogsList">
+                <p class="empty-state">No console errors or warnings recorded.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Network Errors Accordion -->
+          <div class="accordion-item" id="accordionNetwork">
+            <button type="button" class="accordion-header">
+              <div class="accordion-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <span>Failed Network Calls</span>
+              </div>
+              <div class="accordion-meta">
+                <span class="pill-badge warning" id="badgeNetworkCount">0 Failures</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+            </button>
+            <div class="accordion-content">
+              <div class="log-list" id="networkLogsList">
+                <p class="empty-state">No HTTP non-2xx network requests recorded.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Environment Metadata Accordion -->
+          <div class="accordion-item" id="accordionMeta">
+            <button type="button" class="accordion-header">
+              <div class="accordion-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <span>Device & Metadata</span>
+              </div>
+              <div class="accordion-meta">
+                <span class="pill-badge info" id="metaUrlDomain">URL Details</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+            </button>
+            <div class="accordion-content">
+              <div class="metadata-table" id="metadataTable">
+                <!-- Auto populated -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Submit Bar -->
+        <div class="submit-bar">
+          <button type="button" class="btn btn-primary" id="btnSubmitTicket">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <span id="submitBtnLabel">Export Bug Ticket</span>
+          </button>
+        </div>
+
+        <!-- Toast Status Banner -->
+        <div class="status-banner hidden" id="statusBanner">
+          <div class="status-icon" id="statusIcon"></div>
+          <div class="status-text" id="statusText">Processing ticket...</div>
+        </div>
+
+      </form>
+    </main>
+
+    <!-- Settings & Integration Modal View -->
+    <div class="modal-overlay hidden" id="settingsModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Integration Settings</h2>
+          <button class="icon-button" id="btnCloseSettings">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="target-selector">
+            <label class="target-option">
+              <input type="radio" name="targetPlatform" value="github" checked id="radioGithub">
+              <div class="target-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                <span>GitHub Issues</span>
+              </div>
+            </label>
+
+            <label class="target-option">
+              <input type="radio" name="targetPlatform" value="jira" id="radioJira">
+              <div class="target-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 11.524H0a11.524 11.524 0 0 0 11.571 11.524V11.524zm0-11.524v11.524h11.524A11.524 11.524 0 0 0 11.571 0z"/></svg>
+                <span>Jira Cloud</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- GitHub Settings Panel -->
+          <div class="config-panel" id="panelGithub">
+            <div class="form-group">
+              <label for="cfgGithubToken">Personal Access Token (PAT) <span class="required">*</span></label>
+              <input type="password" id="cfgGithubToken" placeholder="ghp_xxxxxxxxxxxx or github_pat_xxxx">
+              <span class="help-text">Requires <code>public_repo</code> or <code>repo</code> scope permission.</span>
+            </div>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="cfgGithubOwner">Repo Owner / Org <span class="required">*</span></label>
+                <input type="text" id="cfgGithubOwner" placeholder="e.g. acme-corp">
+              </div>
+              <div class="form-group flex-1">
+                <label for="cfgGithubRepo">Repository Name <span class="required">*</span></label>
+                <input type="text" id="cfgGithubRepo" placeholder="e.g. my-web-app">
+              </div>
+            </div>
+          </div>
+
+          <!-- Jira Settings Panel -->
+          <div class="config-panel hidden" id="panelJira">
+            <div class="form-group">
+              <label for="cfgJiraDomain">Jira Site Domain <span class="required">*</span></label>
+              <input type="text" id="cfgJiraDomain" placeholder="e.g. company.atlassian.net">
+            </div>
+            <div class="form-group">
+              <label for="cfgJiraEmail">User Email Address <span class="required">*</span></label>
+              <input type="email" id="cfgJiraEmail" placeholder="your-email@company.com">
+            </div>
+            <div class="form-group">
+              <label for="cfgJiraToken">Jira API Token <span class="required">*</span></label>
+              <input type="password" id="cfgJiraToken" placeholder="Atlassian API token">
+              <span class="help-text">Generate at <code>id.atlassian.com/manage-profile/security/api-tokens</code></span>
+            </div>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="cfgJiraProject">Project Key <span class="required">*</span></label>
+                <input type="text" id="cfgJiraProject" placeholder="e.g. BUG, PROJ">
+              </div>
+              <div class="form-group flex-1">
+                <label for="cfgJiraIssueType">Issue Type</label>
+                <input type="text" id="cfgJiraIssueType" value="Bug" placeholder="Bug">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="cfgJiraComponent">Component</label>
+                <input type="text" id="cfgJiraComponent" placeholder="e.g. Frontend, API">
+              </div>
+              <div class="form-group flex-1">
+                <label for="cfgJiraPriority">Priority</label>
+                <select id="cfgJiraPriority">
+                  <option value="Highest">Highest</option>
+                  <option value="High">High</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="Low">Low</option>
+                  <option value="Lowest">Lowest</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="cfgJiraEnvironment">Environment</label>
+                <select id="cfgJiraEnvironment">
+                  <option value="Production" selected>Production</option>
+                  <option value="UAT / Staging">UAT / Staging</option>
+                  <option value="Development">Development</option>
+                  <option value="QA Testing">QA Testing</option>
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label for="cfgJiraAssignee">Assignee Account ID</label>
+                <input type="text" id="cfgJiraAssignee" placeholder="Optional User ID">
+              </div>
+            </div>
+          </div>
+
+          <!-- Connection Test Feedback -->
+          <div class="test-feedback hidden" id="testFeedback"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnTestConfig">Test Connection</button>
+          <button type="button" class="btn btn-primary" id="btnSaveConfig">Save Settings</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../lib/storage.js"></script>
+  <script src="../lib/github-api.js"></script>
+  <script src="../lib/jira-api.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

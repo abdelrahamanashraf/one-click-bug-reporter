@@ -1,0 +1,18 @@
+{
+  "name": "one-click-bug-reporter",
+  "version": "1.0.0",
+  "description": "Chrome & Edge Extension (Manifest V3) for automated bug reporting to Jira and GitHub Issues.",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "keywords": [
+    "chrome-extension",
+    "edge-extension",
+    "manifest-v3",
+    "bug-reporter",
+    "jira",
+    "github-issues"
+  ],
+  "author": "Senior Extension Developer",
+  "license": "MIT"
+}
