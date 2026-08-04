@@ -182,37 +182,5 @@ This generates `dist/one-click-bug-reporter-v1.0.0.zip` ready for store uploads!
 
 ---
 
-## 🚀 How to Deploy to GitHub
-
-To push this codebase to your GitHub account as a new repository:
-
-### Step 1: Create a New Repository on GitHub
-Go to [github.com/new](https://github.com/new) and create a new repository named `one-click-bug-reporter`.
-
-### Step 2: Initialize Git & Push from Terminal
-Open your terminal inside the project directory (`c:\Users\LENOVO\Downloads\One-Click Bug Reporter`) and run:
-
-```bash
-# 1. Initialize git repository
-git init
-
-# 2. Add all files
-git add .
-
-# 3. Create initial commit
-git commit -m "Initial commit: One-Click Bug Reporter Chrome & Edge Extension"
-
-# 4. Rename branch to main
-git branch -M main
-
-# 5. Link your remote GitHub repository (Replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/one-click-bug-reporter.git
-
-# 6. Push code to GitHub
-git push -u origin main
-```
-
----
-
 ## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
